@@ -55,14 +55,16 @@ import org.omegat.util.WikiGet;
 public class MicrosoftTranslatorAzure extends BaseTranslate {
     private static final Logger LOGGER = Logger.getLogger(MicrosoftTranslatorAzure.class.getName());
 
-    protected static final String PROPERTY_SUBSCRIPTION_KEY = "microsoft.api.subscription_key";
-
+    protected String PROPERTY_SUBSCRIPTION_KEY = "microsoft.api.subscription_key";
+    
+    protected String PROPERTY_CATEGORY_KEY = "microsoft.api.category_key";;
+        
     protected static final String URL_TOKEN = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
     protected static final String URL_TRANSLATE = "https://api.microsofttranslator.com/v2/http.svc/Translate";
     protected static final Pattern RE_RESPONSE = Pattern.compile("<string[^>]*>(.+)</string>");
 
     protected String accessToken;
-
+    
     @Override
     protected String getPreferenceName() {
         return Preferences.ALLOW_MICROSOFT_TRANSLATOR_AZURE;
@@ -142,11 +144,13 @@ public class MicrosoftTranslatorAzure extends BaseTranslate {
     }
 
     private String requestTranslate(String langFrom, String langTo, String text) throws Exception {
+        String category = getCredential(PROPERTY_CATEGORY_KEY);
         Map<String, String> p = new TreeMap<String, String>();
         p.put("appid", "Bearer " + accessToken);
         p.put("text", text);
         p.put("from", langFrom);
         p.put("to", langTo);
+        p.put("category", category);
         p.put("contentType", "text/plain");
 
         String r = WikiGet.get(URL_TRANSLATE, p, null);
@@ -159,7 +163,7 @@ public class MicrosoftTranslatorAzure extends BaseTranslate {
         } else {
             LOGGER.warning(OStrings.getString("MT_ENGINE_MICROSOFT_WRONG_RESPONSE"));
             return null;
-        }
+        }                                                     
     }
 
     @Override
@@ -173,14 +177,16 @@ public class MicrosoftTranslatorAzure extends BaseTranslate {
             @Override
             protected void onConfirm() {
                 String key = panel.valueField1.getText().trim();
+                String category = panel.valueField2.getText().trim();
                 boolean temporary = panel.temporaryCheckBox.isSelected();
                 setCredential(PROPERTY_SUBSCRIPTION_KEY, key, temporary);
+                setCredential(PROPERTY_CATEGORY_KEY, category, temporary);
             }
         };
         dialog.panel.valueLabel1.setText(OStrings.getString("MT_ENGINE_MICROSOFT_SUBSCRIPTION_KEY_LABEL"));
         dialog.panel.valueField1.setText(getCredential(PROPERTY_SUBSCRIPTION_KEY));
-        dialog.panel.valueLabel2.setVisible(false);
-        dialog.panel.valueField2.setVisible(false);
+        dialog.panel.valueLabel2.setText(OStrings.getString("MT_ENGINE_MICROSOFT_CATEGORY_KEY_LABEL"));
+        dialog.panel.valueField2.setText(getCredential(PROPERTY_CATEGORY_KEY));
         dialog.panel.temporaryCheckBox.setSelected(isCredentialStoredTemporarily(PROPERTY_SUBSCRIPTION_KEY));
         dialog.show();
     }

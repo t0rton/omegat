@@ -428,6 +428,17 @@ public class MainWindowMenuHandler {
             Core.getEditor().replaceEditText(tr);
         }
     }
+    
+    public void editOverwriteAllMachineTranslationMenuItemActionPerformed() {
+        Core.getEditor().gotoEntry(1);
+//        String tr = Core.getMachineTranslatePane().getDisplayedTranslation();
+//        Log.log(tr);
+//        if (tr == null) {
+//            Core.getMachineTranslatePane().forceLoad();
+//        } else if (!StringUtil.isEmpty(tr)) {
+//            Core.getEditor().replaceEditText(tr);
+//        }
+    }
 
     /**
      * replaces entire edited segment text with a the source text of a segment at cursor position
